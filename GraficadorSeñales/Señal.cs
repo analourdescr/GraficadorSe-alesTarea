@@ -6,47 +6,64 @@ using System.Threading.Tasks;
 
 namespace GraficadorSeñales
 {
-     abstract class Señal
+    abstract class Señal
     {
-        public List<Muestra> muestras { get; set; }
+        public List<Muestra> Muestras { get; set; }
         public double AmplitudMaxima { get; set; }
+        public double Amplitud { get; set; }
+        public double Fase { get; set; }
+        public double Frecuencia { get; set; }
+        public double FrecuenciaMuestreo { get; set; }
         public double TiempoInicial { get; set; }
         public double TiempoFinal { get; set; }
-        public double FrecuenciaMuestreo { get; set; }
+        public double Alpha { get; set; }
 
-    public abstract double evaluar(double tiempo);
+        abstract public double evaluar(double tiempo);
 
-        public void ConstruirSeñalDigital()
+        public void construirSeñalDigital()
         {
             double periodoMuestreo = 1 / FrecuenciaMuestreo;
 
-            for (double i = TiempoInicial;
-                i <= TiempoFinal;
-                i += periodoMuestreo)
+            for (double i = TiempoInicial; i <= TiempoFinal; i += periodoMuestreo)
             {
-                double Muestra = evaluar(i);
-                if (Math.Abs(Muestra) > AmplitudMaxima)
+                double valorMuestra = evaluar(i);
+
+                if (Math.Abs(valorMuestra) > AmplitudMaxima)
                 {
-                    AmplitudMaxima = Math.Abs(Muestra);
+                    AmplitudMaxima = Math.Abs(valorMuestra);
                 }
-            muestras.Add(new Muestra(i, evaluar(i)));
 
+                Muestras.Add(new Muestra(i, valorMuestra));
+            }
+        }
 
+        public void truncar(double n)
+        {
+            foreach (Muestra muestra in Muestras)
+            {
+                if (muestra.Y > n)
+                {
+                    muestra.Y = n;
+                }
+                else if (muestra.Y < -n)
+                {
+                    muestra.Y = -n;
+                }
             }
         }
 
         public void escalar(double factor)
         {
-            foreach(Muestra muestra in muestras)
+            foreach (Muestra muestra in Muestras)
             {
-                muestra.Y *= factor ;
+                muestra.Y *= factor;
             }
         }
 
         public void actualizarAmplitudMaxima()
         {
             AmplitudMaxima = 0;
-            foreach (Muestra muestra in muestras)
+            foreach (Muestra muestra in Muestras)
             {
                 if (Math.Abs(muestra.Y) > AmplitudMaxima)
                 {
@@ -54,18 +71,13 @@ namespace GraficadorSeñales
                 }
             }
         }
-        /**/
 
-        public void desplazar(double desplazamiento)
+        public void desplazar(double factor)
         {
-            
-            foreach (Muestra muestra in muestras)
+            foreach (Muestra muestra in Muestras)
             {
-                muestra.Y += desplazamiento ;
+                muestra.Y += factor;
             }
         }
-
-        // checkbox.AutoCheck=false;
-
     }
 }

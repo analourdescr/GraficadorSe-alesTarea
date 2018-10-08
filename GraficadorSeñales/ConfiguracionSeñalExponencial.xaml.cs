@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace GraficadorSeñales
 {
     /// <summary>
-    /// Lógica de interacción para ConfiguracionExponencial.xaml
+    /// Lógica de interacción para ConfiguracionSeñalExponencial.xaml
     /// </summary>
-    public partial class ConfiguracionExponencial : UserControl
+    public partial class ConfiguracionSeñalExponencial : UserControl
     {
-        public ConfiguracionExponencial()
+        public ConfiguracionSeñalExponencial()
         {
             InitializeComponent();
         }

@@ -6,32 +6,30 @@ using System.Threading.Tasks;
 
 namespace GraficadorSeñales
 {
-    class Exponencial : Señal
+    class SeñalExponencial : Señal
     {
-        public double Alpha { get; set; }
-     
-
-
-        public Exponencial()
+        public SeñalExponencial()
         {
+            Muestras = new List<Muestra>();
+            AmplitudMaxima = 0.0;
             Alpha = 0;
-            muestras = new List<Muestra>();
         }
 
-        public Exponencial(double Alpha)
+        public SeñalExponencial(double alpha)
         {
-            this.Alpha = Alpha;
-            muestras = new List<Muestra>();
+            Alpha = alpha;
+            Muestras = new List<Muestra>();
+            AmplitudMaxima = 0.0;
         }
 
         override public double evaluar(double tiempo)
         {
             double resultado;
             resultado = Math.Exp(Alpha * tiempo);
+
             return resultado;
         }
     }
-
 }
 
 

@@ -16,15 +16,14 @@ using System.Windows.Shapes;
 namespace GraficadorSeñales
 {
     /// <summary>
-    /// Lógica de interacción para ConfiguracionSenalSenoidal.xaml
+    /// Lógica de interacción para ConfiguracionSeñalSenoidal.xaml
     /// </summary>
-    public partial class ConfiguracionSenalSenoidal : UserControl
+    public partial class ConfiguracionSeñalSenoidal : UserControl
     {
-        public ConfiguracionSenalSenoidal()
+        public ConfiguracionSeñalSenoidal()
         {
             InitializeComponent();
         }
-
-        
     }
 }
+

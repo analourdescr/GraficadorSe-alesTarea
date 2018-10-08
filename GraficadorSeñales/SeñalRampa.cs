@@ -6,18 +6,9 @@ using System.Threading.Tasks;
 
 namespace GraficadorSeñales
 {
-    class Rampa : Señal
+    class SeñalRampa : Señal
     {
-
-        public List<Muestra> Muestras { get; set; }
-        public double AmplitudMaxima { get; set; }
-
-        public Rampa()
-        {
-            Muestras = new List<Muestra>();
-            AmplitudMaxima = 0.0;
-        }
-        public Rampa(double amplitud, double fase, double frecuencia)
+        public SeñalRampa()
         {
             Muestras = new List<Muestra>();
             AmplitudMaxima = 0.0;
@@ -26,16 +17,11 @@ namespace GraficadorSeñales
         override public double evaluar(double tiempo)
         {
             double resultado;
-
-            if (tiempo >= 0)
-            {
-                resultado = tiempo;
-            }
-            else
+            resultado = tiempo;
+            if (resultado < 0)
             {
                 resultado = 0;
             }
-
             return resultado;
         }
     }

@@ -23,172 +23,119 @@ namespace GraficadorSeñales
         public MainWindow()
         {
             InitializeComponent();
-
-
-
         }
 
-        private void btnGraficar_Click(object sender, RoutedEventArgs e)
+        private void BotonGraficar_Click(object sender, RoutedEventArgs e)
         {
-           
-            double TiempoInicial = double.Parse(txtTiempoInicial.Text);
-            double TiempoFinal = double.Parse(txtTiempoFinal.Text);
-            double Muestreo = double.Parse(txtMuestreo.Text);
+            double tiempoInicial = double.Parse(txt_TiempoInicial.Text);
+            double tiempoFinal = double.Parse(txt_TiempoFinal.Text);
+            double frecuenciaMuestreo = double.Parse(txt_FrecuenciaDeMuestreo.Text);
 
-            Señal senal;
-            switch(cbTipoSeñal.SelectedIndex)
+            Señal señal;
+
+            switch (cb_TipoSeñal.SelectedIndex)
             {
-                // Senoidal
+                // Señal Senoidal
                 case 0:
+                    double amplitud = double.Parse(((ConfiguracionSeñalSenoidal)(panelConfiguracion.Children[0])).txt_Amplitud.Text);
+                    double fase = double.Parse(((ConfiguracionSeñalSenoidal)(panelConfiguracion.Children[0])).txt_Fase.Text);
+                    double frecuencia = double.Parse(((ConfiguracionSeñalSenoidal)(panelConfiguracion.Children[0])).txt_Frecuencia.Text);
 
-                    double Amplitud =
-                        double.Parse(((ConfiguracionSenalSenoidal)PanelConfiguracion.Children[0]).txtAmplitud.Text);
-
-                    double Fase =
-                        double.Parse(((ConfiguracionSenalSenoidal)PanelConfiguracion.Children[0]).txtFase1.Text);
-
-                    double Frecuencia =
-                        double.Parse(((ConfiguracionSenalSenoidal)PanelConfiguracion.Children[0]).txtFrecuencia.Text);
-
-                    senal =  new SenalSenoidal(Amplitud, Fase, Frecuencia);
+                    señal = new SeñalSenoidal(amplitud, fase, frecuencia);
                     break;
-                case 1: senal = new Rampa();
+
+                // Señal Rampa
+                case 1:
+                    señal = new SeñalRampa();
                     break;
+
+                // Señal Exponencial
                 case 2:
-                    double Alpha =
-                        double.Parse(((ConfiguracionExponencial)PanelConfiguracion.Children[0]).txtAlpha.Text);
-
-                    senal = new Exponencial (Alpha);
-                    
+                    double alpha = double.Parse(((ConfiguracionSeñalExponencial)(panelConfiguracion.Children[0])).txt_Alpha.Text);
+                    señal = new SeñalExponencial(alpha);
                     break;
 
                 default:
-
-                    senal = null;
+                    señal = null;
                     break;
             }
 
-            senal.TiempoInicial = TiempoInicial;
-            senal.TiempoFinal = TiempoFinal;
-            senal.FrecuenciaMuestreo = Muestreo;
-            senal.ConstruirSeñalDigital();
+            señal.TiempoInicial = tiempoInicial;
+            señal.TiempoFinal = tiempoFinal;
+            señal.FrecuenciaMuestreo = frecuenciaMuestreo;
+
+            señal.construirSeñalDigital();
+
+            // Truncar
+            if ((bool)ckb_Truncado.IsChecked)
+            {
+                double n = double.Parse(txt_Truncado.Text);
+                señal.truncar(n);
+            }
 
             // Escalar
-            if ((bool)CheckEscalar.IsChecked)
+            if ((bool)ckb_Escala.IsChecked)
             {
-                double factorEscala = double.Parse(txtAmplitud.Text);
-                senal.escalar(factorEscala);
+                double factorEscala = double.Parse(txt_EscalaAmplitud.Text);
+                señal.escalar(factorEscala);
             }
-                        
-            // Desplazar.
-              if ((bool)CheckDesplazamiento.IsChecked)
+
+            // Desplazar
+            if ((bool)ckb_Desplazamiento.IsChecked)
             {
-                double factorDesplazamiento = double.Parse(txtDesplazamiento.Text);
-                senal.desplazar(factorDesplazamiento);
-                senal.actualizarAmplitudMaxima();
+                double factorDesplazamiento = double.Parse(txt_Desplazamiento.Text);
+                señal.desplazar(factorDesplazamiento);
             }
-               
-            plnGrafica.Points.Clear();
 
-            if (senal != null)
-            {
-             // Recorrer una coleccion o arreglo
-            foreach (Muestra muestra in senal.muestras)
-                 {
-                plnGrafica.Points.Add(new Point((muestra.X - TiempoInicial) * Scroll.Width, (muestra.Y / senal.AmplitudMaxima 
-                    * ((Scroll.Height / 2) - 30) * -1 + (Scroll.Height / 2))));
-                 }
-
-            }
-                    
-           
-
-            plnEjeX.Points.Clear();
-            // Punto de inicio
-            plnEjeX.Points.Add(new Point(0, (Scroll.Height / 2)));
-            // Punto final.
-            plnEjeX.Points.Add(new Point((TiempoFinal - TiempoInicial) * Scroll.Width, (Scroll.Height / 2)));
-
-
-         
-
-            lblAmplitudMaximaPositiva.Text = senal.AmplitudMaxima.ToString();
-            lblAmplitudMaximaNegativa.Text = " - " + senal.AmplitudMaxima.ToString();
-        }
-
-        
-        private void btnRampa_Click(object sender, RoutedEventArgs e)
-        {
-            double tiempoInicial = double.Parse(txtTiempoInicial.Text);
-            double tiempoFinal = double.Parse(txtTiempoFinal.Text);
-            double frecuenciaMuestreo = double.Parse(txtMuestreo.Text);
-
-            Rampa Rampa = new Rampa();
+            // Actualizar
+            señal.actualizarAmplitudMaxima();
 
             plnGrafica.Points.Clear();
 
-            double periodoMuestreo = 1 / frecuenciaMuestreo;
-            for (double i = tiempoInicial; i <= tiempoFinal; i += periodoMuestreo)
+            if (señal != null)
             {
-                double valorMuestra = Rampa.evaluar(i);
-
-                if (Math.Abs(valorMuestra) > Rampa.AmplitudMaxima)
+                // Sirve para recorrer una coleccion o arreglo
+                foreach (Muestra muestra in señal.Muestras)
                 {
-                    Rampa.AmplitudMaxima = Math.Abs(valorMuestra);
+                    plnGrafica.Points.Add(new Point((muestra.X - tiempoInicial) * scrContenedor.Width, (muestra.Y / señal.AmplitudMaxima * ((scrContenedor.Height / 2) - 30) * -1 + (scrContenedor.Height / 2))));
                 }
 
-                Rampa.Muestras.Add(new Muestra(i, valorMuestra));
-
+                lbl_AmplitudMaxima.Text = señal.AmplitudMaxima.ToString();
+                lbl_AmplitudMinima.Text = "-" + señal.AmplitudMaxima.ToString();
             }
 
+            // Línea del Eje X
+            plnEjeX.Points.Clear();
+            plnEjeX.Points.Add(new Point(0, scrContenedor.Height / 2));
+            plnEjeX.Points.Add(new Point((tiempoFinal - tiempoInicial) * scrContenedor.Width, scrContenedor.Height / 2));
 
-            //Recorrer una colección o arreglo
-            //La variable muestra guarda cada elemento de la colección de: señal.Muestra
-            foreach (Muestra muestra in Rampa.Muestras)
-            {
-                plnGrafica.Points.Add(new Point(muestra.X * Scroll.Width, (muestra.Y *
-                    ((Scroll.Height / 2)) - 30) * -1 + (Scroll.Height / 2)));
-            }
+            // Línea del Eje Y
+            plnEjeY.Points.Clear();
+            plnEjeY.Points.Add(new Point((-tiempoInicial) * scrContenedor.Width, 0));
+            plnEjeY.Points.Add(new Point((-tiempoInicial) * scrContenedor.Width, scrContenedor.Height));
         }
 
-        private void cbTipoSeñal_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void cb_TipoSeñal_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (PanelConfiguracion != null)
+            panelConfiguracion.Children.Clear();
+            switch (cb_TipoSeñal.SelectedIndex)
             {
-
-
-            }
-            PanelConfiguracion.Children.Clear();
-            switch (cbTipoSeñal.SelectedIndex)
-            {
+                // Señal Senoidal
                 case 0:
-                    PanelConfiguracion.Children.Add(
-                        new ConfiguracionSenalSenoidal()
-                        );
+                    panelConfiguracion.Children.Add(new ConfiguracionSeñalSenoidal());
                     break;
+
+                // Señal Rampa
                 case 1:
-                    
-                    break;
-                case 2:
-                    PanelConfiguracion.Children.Add(new ConfiguracionExponencial());
                     break;
                 default:
                     break;
+
+                // Señal Senoidal
+                case 2:
+                    panelConfiguracion.Children.Add(new ConfiguracionSeñalExponencial());
+                    break;
             }
         }
-
-        /*private void CheckedAmplitud_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (CheckAmplitud.IsSealed)
-            {
-                txtAmplitud.IsEnabled = false;
-            }
-            else {
-                txtAmplitud.IsEnabled = true;
-            }
-          
-            }
-             */
-
     }
 }
